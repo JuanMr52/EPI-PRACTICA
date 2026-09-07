@@ -1,0 +1,1065 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Práctica de Epidemiología</title>
+<style>
+  :root{
+    --bg:#F5F6F8;
+    --card:#FFFFFF;
+    --border:#DFE3E8;
+    --text:#1F2430;
+    --text-muted:#5B6270;
+    --blue:#1D4E8F;
+    --blue-dark:#153B6E;
+    --blue-tint:#EAF0F9;
+    --green:#1E7B45;
+    --green-tint:#E7F5EC;
+    --green-border:#B7DFC4;
+    --red:#B3261E;
+    --red-tint:#FCEBEA;
+    --red-border:#F0B8B4;
+    --gold:#C9962C;
+    --radius:10px;
+    --shadow:0 1px 2px rgba(20,24,32,0.06), 0 1px 1px rgba(20,24,32,0.04);
+    font-size:16px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:"Source Serif Pro","Georgia",serif;
+    -webkit-font-smoothing:antialiased;
+    line-height:1.5;
+  }
+  .ui{
+    font-family:"Inter","Segoe UI",system-ui,-apple-system,sans-serif;
+  }
+  #app{
+    max-width:760px;
+    margin:0 auto;
+    padding:20px 16px 56px;
+  }
+  header.top{
+    text-align:center;
+    margin-bottom:20px;
+  }
+  header.top h1{
+    font-size:1.55rem;
+    font-weight:600;
+    margin:0 0 4px;
+    letter-spacing:0.2px;
+    color:var(--blue-dark);
+  }
+  header.top p.sub{
+    font-family:"Inter",sans-serif;
+    font-size:0.85rem;
+    color:var(--text-muted);
+    margin:0;
+  }
+
+  .toolbar{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    margin-bottom:16px;
+    font-family:"Inter",sans-serif;
+    flex-wrap:wrap;
+  }
+  .toolbar .meta{
+    font-size:0.82rem;
+    color:var(--text-muted);
+  }
+  select#difficultyFilter{
+    font-family:"Inter",sans-serif;
+    font-size:0.85rem;
+    padding:6px 10px;
+    border:1px solid var(--border);
+    border-radius:8px;
+    background:var(--card);
+    color:var(--text);
+  }
+
+  .card{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    box-shadow:var(--shadow);
+    padding:20px;
+    margin-bottom:16px;
+  }
+
+  .problem-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:12px;
+    margin-bottom:6px;
+    font-family:"Inter",sans-serif;
+  }
+  .problem-id{
+    font-size:0.78rem;
+    color:var(--text-muted);
+    text-transform:none;
+  }
+  .stars{
+    color:var(--gold);
+    font-size:0.95rem;
+    letter-spacing:1px;
+    white-space:nowrap;
+  }
+  .cat-badge{
+    display:inline-block;
+    font-family:"Inter",sans-serif;
+    font-size:0.72rem;
+    color:var(--blue-dark);
+    background:var(--blue-tint);
+    padding:2px 9px;
+    border-radius:999px;
+    margin-bottom:10px;
+  }
+  h2.problem-title{
+    font-size:1.15rem;
+    margin:2px 0 10px;
+    color:var(--text);
+    font-weight:600;
+  }
+  p.problem-text{
+    font-size:1rem;
+    color:var(--text);
+    margin:0;
+  }
+
+  h3.section-title{
+    font-family:"Inter",sans-serif;
+    font-size:0.78rem;
+    font-weight:600;
+    text-transform:uppercase;
+    letter-spacing:0.6px;
+    color:var(--text-muted);
+    margin:0 0 12px;
+  }
+
+  table.epi-table{
+    width:100%;
+    border-collapse:collapse;
+    font-family:"Inter",sans-serif;
+    font-size:0.85rem;
+  }
+  table.epi-table th, table.epi-table td{
+    border:1px solid var(--border);
+    padding:8px 6px;
+    text-align:center;
+    vertical-align:middle;
+  }
+  table.epi-table th{
+    background:#FAFBFC;
+    font-weight:600;
+    color:var(--text-muted);
+    font-size:0.78rem;
+  }
+  table.epi-table td.row-label{
+    background:#FAFBFC;
+    font-weight:600;
+    text-align:left;
+    font-size:0.78rem;
+    color:var(--text-muted);
+    padding-left:10px;
+  }
+  table.epi-table td.corner{
+    background:#FAFBFC;
+  }
+  .cell-input-wrap{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:2px;
+  }
+  input.cell-input{
+    width:100%;
+    max-width:78px;
+    text-align:center;
+    font-family:"Inter",sans-serif;
+    font-size:0.95rem;
+    padding:8px 4px;
+    border:1px solid var(--border);
+    border-radius:6px;
+    background:#fff;
+    color:var(--text);
+  }
+  input.cell-input:focus{
+    outline:2px solid var(--blue);
+    outline-offset:1px;
+    border-color:var(--blue);
+  }
+  .cell-status{
+    font-size:0.68rem;
+    font-weight:600;
+    font-family:"Inter",sans-serif;
+  }
+  .cell-status.ok{color:var(--green);}
+  .cell-status.bad{color:var(--red);}
+  .cell-correct-hint{
+    font-size:0.68rem;
+    color:var(--red);
+    font-family:"Inter",sans-serif;
+  }
+
+  td.field.ok input{background:var(--green-tint); border-color:var(--green-border);}
+  td.field.bad input{background:var(--red-tint); border-color:var(--red-border);}
+
+  .pct-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:12px;
+    margin-top:6px;
+  }
+  @media (max-width:480px){
+    .pct-grid{grid-template-columns:1fr;}
+  }
+  .pct-field{
+    font-family:"Inter",sans-serif;
+  }
+  .pct-field label{
+    display:block;
+    font-size:0.82rem;
+    font-weight:600;
+    color:var(--text);
+    margin-bottom:5px;
+  }
+  .pct-input-row{
+    display:flex;
+    align-items:center;
+    gap:6px;
+  }
+  input.pct-input{
+    flex:1;
+    font-family:"Inter",sans-serif;
+    font-size:0.95rem;
+    padding:9px 8px;
+    border:1px solid var(--border);
+    border-radius:8px;
+    background:#fff;
+    color:var(--text);
+  }
+  input.pct-input:focus{
+    outline:2px solid var(--blue);
+    outline-offset:1px;
+    border-color:var(--blue);
+  }
+  .pct-field.ok input{background:var(--green-tint); border-color:var(--green-border);}
+  .pct-field.bad input{background:var(--red-tint); border-color:var(--red-border);}
+  .pct-feedback{
+    font-size:0.74rem;
+    margin-top:4px;
+  }
+  .pct-feedback.ok{color:var(--green);}
+  .pct-feedback.bad{color:var(--red);}
+  .hint-text{
+    font-family:"Inter",sans-serif;
+    font-size:0.74rem;
+    color:var(--text-muted);
+    margin:8px 0 0;
+  }
+
+  .actions{
+    display:flex;
+    justify-content:center;
+    gap:10px;
+    margin-top:18px;
+  }
+  button{
+    font-family:"Inter",sans-serif;
+    font-size:0.92rem;
+    font-weight:600;
+    padding:11px 26px;
+    border-radius:8px;
+    border:1px solid transparent;
+    cursor:pointer;
+  }
+  button:focus-visible{
+    outline:2px solid var(--blue-dark);
+    outline-offset:2px;
+  }
+  button.primary{
+    background:var(--blue);
+    color:#fff;
+  }
+  button.primary:hover{background:var(--blue-dark);}
+  button.secondary{
+    background:#fff;
+    color:var(--blue-dark);
+    border:1px solid var(--blue);
+  }
+  button.secondary:hover{background:var(--blue-tint);}
+  .warn-msg{
+    font-family:"Inter",sans-serif;
+    font-size:0.82rem;
+    color:var(--red);
+    text-align:center;
+    margin-top:10px;
+  }
+
+  .result-card{
+    text-align:center;
+  }
+  .result-card h3.section-title{text-align:center;}
+  .score-big{
+    font-family:"Inter",sans-serif;
+    font-size:2.4rem;
+    font-weight:700;
+    color:var(--blue-dark);
+    margin:4px 0;
+  }
+  .score-sub{
+    font-family:"Inter",sans-serif;
+    font-size:0.85rem;
+    color:var(--text-muted);
+    margin-bottom:6px;
+  }
+  .score-tag{
+    display:inline-block;
+    font-family:"Inter",sans-serif;
+    font-size:0.85rem;
+    font-weight:600;
+    padding:4px 14px;
+    border-radius:999px;
+    margin-top:6px;
+  }
+  .score-tag.excelente{background:var(--green-tint); color:var(--green);}
+  .score-tag.muybien{background:var(--green-tint); color:var(--green);}
+  .score-tag.bien{background:var(--blue-tint); color:var(--blue-dark);}
+  .score-tag.repasar{background:#FBF2DF; color:#8A6116;}
+  .score-tag.reforzar{background:var(--red-tint); color:var(--red);}
+
+  .review-list{
+    font-family:"Inter",sans-serif;
+    font-size:0.86rem;
+    text-align:left;
+    margin-top:14px;
+  }
+  .review-item{
+    padding:8px 0;
+    border-bottom:1px solid var(--border);
+    display:flex;
+    gap:8px;
+  }
+  .review-item:last-child{border-bottom:none;}
+  .review-icon{font-weight:700;}
+  .review-icon.ok{color:var(--green);}
+  .review-icon.bad{color:var(--red);}
+  .review-body b{font-weight:600;}
+  .review-detail{color:var(--text-muted); font-size:0.82rem; margin-top:2px;}
+
+  .progress-grid{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:10px;
+    font-family:"Inter",sans-serif;
+    font-size:0.82rem;
+  }
+  .progress-item{
+    background:#FAFBFC;
+    border:1px solid var(--border);
+    border-radius:8px;
+    padding:10px 12px;
+  }
+  .progress-item .num{
+    font-size:1.25rem;
+    font-weight:700;
+    color:var(--blue-dark);
+    display:block;
+  }
+  .progress-item .lab{color:var(--text-muted);}
+
+  footer.note{
+    text-align:center;
+    font-family:"Inter",sans-serif;
+    font-size:0.72rem;
+    color:var(--text-muted);
+    margin-top:24px;
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{transition:none !important;}
+  }
+</style>
+</head>
+<body>
+<div id="app">
+  <header class="top">
+    <h1>Práctica de Epidemiología</h1>
+    <p class="sub ui">Tablas 2×2 · Pruebas diagnósticas</p>
+  </header>
+
+  <div class="toolbar">
+    <span class="meta" id="problemCounter">Problema — de 50</span>
+    <label class="ui" style="font-size:0.82rem; color:var(--text-muted); display:flex; align-items:center; gap:6px;">
+      Dificultad:
+      <select id="difficultyFilter" aria-label="Filtrar por dificultad">
+        <option value="all">Todas</option>
+        <option value="1">⭐</option>
+        <option value="2">⭐⭐</option>
+        <option value="3">⭐⭐⭐</option>
+        <option value="4">⭐⭐⭐⭐</option>
+        <option value="5">⭐⭐⭐⭐⭐</option>
+      </select>
+    </label>
+  </div>
+
+  <div class="card">
+    <div class="problem-head">
+      <span class="problem-id ui" id="problemIdLabel"></span>
+      <span class="stars" id="problemStars" aria-label="Dificultad"></span>
+    </div>
+    <span class="cat-badge" id="problemCategory"></span>
+    <h2 class="problem-title" id="problemTitle"></h2>
+    <p class="problem-text" id="problemText"></p>
+  </div>
+
+  <div class="card">
+    <h3 class="section-title">Tabla de prueba diagnóstica</h3>
+    <table class="epi-table" id="epiTable">
+      <thead>
+        <tr>
+          <th class="corner" scope="col"></th>
+          <th scope="col">Prueba +</th>
+          <th scope="col">Prueba −</th>
+          <th scope="col">Total</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="row-label">Enfermedad +</td>
+          <td class="field" data-field="vp"></td>
+          <td class="field" data-field="fn"></td>
+          <td class="field" data-field="totEnfPos"></td>
+        </tr>
+        <tr>
+          <td class="row-label">Enfermedad −</td>
+          <td class="field" data-field="fp"></td>
+          <td class="field" data-field="vn"></td>
+          <td class="field" data-field="totEnfNeg"></td>
+        </tr>
+        <tr>
+          <td class="row-label">Total</td>
+          <td class="field" data-field="totPruebaPos"></td>
+          <td class="field" data-field="totPruebaNeg"></td>
+          <td class="field" data-field="totGeneral"></td>
+        </tr>
+      </tbody>
+    </table>
+    <p class="hint-text">VP = Verdadero positivo · FN = Falso negativo · FP = Falso positivo · VN = Verdadero negativo. Completa también los totales de fila, columna y el total general.</p>
+  </div>
+
+  <div class="card">
+    <h3 class="section-title">Resultados</h3>
+    <div class="pct-grid">
+      <div class="pct-field" data-field="sens">
+        <label for="input-sens">Sensibilidad</label>
+        <div class="pct-input-row">
+          <input class="pct-input" type="text" inputmode="decimal" id="input-sens" aria-describedby="hint-sens">
+          <span class="ui" style="font-size:0.85rem; color:var(--text-muted);">%</span>
+        </div>
+        <div class="pct-feedback" id="feedback-sens"></div>
+      </div>
+      <div class="pct-field" data-field="spec">
+        <label for="input-spec">Especificidad</label>
+        <div class="pct-input-row">
+          <input class="pct-input" type="text" inputmode="decimal" id="input-spec">
+          <span class="ui" style="font-size:0.85rem; color:var(--text-muted);">%</span>
+        </div>
+        <div class="pct-feedback" id="feedback-spec"></div>
+      </div>
+      <div class="pct-field" data-field="vpp">
+        <label for="input-vpp">VPP</label>
+        <div class="pct-input-row">
+          <input class="pct-input" type="text" inputmode="decimal" id="input-vpp">
+          <span class="ui" style="font-size:0.85rem; color:var(--text-muted);">%</span>
+        </div>
+        <div class="pct-feedback" id="feedback-vpp"></div>
+      </div>
+      <div class="pct-field" data-field="vpn">
+        <label for="input-vpn">VPN</label>
+        <div class="pct-input-row">
+          <input class="pct-input" type="text" inputmode="decimal" id="input-vpn">
+          <span class="ui" style="font-size:0.85rem; color:var(--text-muted);">%</span>
+        </div>
+        <div class="pct-feedback" id="feedback-vpn"></div>
+      </div>
+    </div>
+    <p id="hint-sens" class="hint-text">Introduce el resultado como porcentaje. Ejemplo: 85.0</p>
+
+    <div class="actions">
+      <button class="primary" id="btnCorrect">Corregir</button>
+    </div>
+    <p class="warn-msg" id="warnMsg" role="alert" style="display:none;"></p>
+  </div>
+
+  <div class="card result-card" id="resultCard" style="display:none;">
+    <h3 class="section-title">Resultado</h3>
+    <div class="score-big" id="scoreBig">0 / 100</div>
+    <div class="score-sub" id="scoreSub">0 correctas · 0 incorrectas</div>
+    <span class="score-tag" id="scoreTag"></span>
+
+    <div class="review-list" id="reviewTableList"></div>
+    <div class="review-list" id="reviewPctList" style="margin-top:6px;"></div>
+
+    <div class="actions">
+      <button class="secondary" id="btnNewProblem">Nuevo problema</button>
+    </div>
+  </div>
+
+  <div class="card" id="progressCard">
+    <h3 class="section-title">Progreso</h3>
+    <div class="progress-grid">
+      <div class="progress-item"><span class="num" id="progCount">0</span><span class="lab">Problemas resueltos</span></div>
+      <div class="progress-item"><span class="num" id="progAvg">—</span><span class="lab">Promedio</span></div>
+      <div class="progress-item"><span class="num" id="progBest">—</span><span class="lab">Mejor puntuación</span></div>
+      <div class="progress-item"><span class="num" id="progHard">0</span><span class="lab">Resueltos ⭐⭐⭐⭐⭐</span></div>
+    </div>
+  </div>
+
+  <footer class="note">Herramienta de práctica académica · Tecnología Médica</footer>
+</div>
+
+<script>
+/* =========================================================
+   BANCO DE PROBLEMAS
+   Cada problema define únicamente VP, FN, FP y VN.
+   Todos los totales y porcentajes se derivan matemáticamente
+   en tiempo de ejecución (ver calculateAll).
+   ========================================================= */
+const PROBLEMS = [
+  {id:1, difficulty:1, category:"Pruebas diagnósticas", title:"Tamizaje de gripe estacional",
+   text:"En un centro de salud se aplicó una prueba rápida de antígeno para gripe a 100 pacientes con síntomas respiratorios. Del total, 50 pacientes tenían gripe confirmada por cultivo viral (prueba de referencia). De ellos, 40 dieron positivo en la prueba rápida y 10 negativo. De los 50 pacientes sin gripe, 5 dieron positivo (falso positivo) y 45 negativo.",
+   vp:40, fn:10, fp:5, vn:45,
+   explanation:"La sensibilidad depende únicamente de los enfermos (VP y FN); la especificidad depende únicamente de los sanos (FP y VN)."},
+  {id:2, difficulty:1, category:"Valores predictivos", title:"Prueba rápida de embarazo",
+   text:"Se evaluó una prueba rápida de embarazo en 100 mujeres. De las 35 mujeres embarazadas (confirmado por ecografía), 30 obtuvieron resultado positivo y 5 negativo. De las 65 mujeres no embarazadas, 10 obtuvieron positivo y 55 negativo.",
+   vp:30, fn:5, fp:10, vn:55,
+   explanation:"El VPP se calcula sobre el total de resultados positivos de la prueba (VP+FP), no sobre el total de enfermos."},
+  {id:3, difficulty:1, category:"Sensibilidad y especificidad", title:"Antígeno de gripe en urgencias",
+   text:"En sala de urgencias, 100 pacientes fueron evaluados con una prueba de antígeno para gripe. De los 50 pacientes con gripe confirmada, 50 dieron positivo (ningún falso negativo). De los 50 pacientes sin gripe, 10 dieron positivo (falsos positivos) y 40 negativo.",
+   vp:50, fn:0, fp:10, vn:40,
+   explanation:"Cuando no hay falsos negativos, la sensibilidad es del 100%."},
+  {id:4, difficulty:1, category:"Tablas 2×2", title:"Tamizaje de anemia escolar",
+   text:"Se realizó tamizaje de anemia con hemoglobinómetro portátil en 100 escolares. De los 25 niños con anemia (confirmada por hemograma), 20 dieron positivo y 5 negativo. De los 75 niños sin anemia, 5 dieron positivo y 70 negativo.",
+   vp:20, fn:5, fp:5, vn:70,
+   explanation:"Recuerda ubicar cada fila según el estado real de enfermedad, no según el resultado de la prueba."},
+  {id:5, difficulty:1, category:"Pruebas diagnósticas", title:"Prueba de VIH en banco de sangre",
+   text:"Un banco de sangre analizó 100 donantes con una prueba rápida de VIH. De los 70 donantes infectados (confirmado por prueba confirmatoria), 60 resultaron positivos y 10 negativos. De los 30 donantes no infectados, 20 resultaron positivos y 10 negativos.",
+   vp:60, fn:10, fp:20, vn:10,
+   explanation:"Con muchos falsos positivos, la especificidad y el VPP se reducen notablemente."},
+  {id:6, difficulty:1, category:"Interpretación de resultados", title:"Prueba de tuberculina (PPD)",
+   text:"Se aplicó la prueba de tuberculina a 100 personas en contacto con un caso de tuberculosis. De las 30 personas infectadas (confirmado por cultivo), 25 tuvieron PPD positivo y 5 negativo. De las 70 personas no infectadas, 15 tuvieron PPD positivo y 55 negativo.",
+   vp:25, fn:5, fp:15, vn:55,
+   explanation:"El VPN se calcula sobre el total de resultados negativos de la prueba (FN+VN)."},
+  {id:7, difficulty:1, category:"Sensibilidad y especificidad", title:"Glucosa en ayunas para diabetes",
+   text:"En un programa de tamizaje, se midió la glucosa en ayunas a 100 adultos. De los 50 con diabetes confirmada por hemoglobina glicosilada, 45 tuvieron glucosa elevada y 5 normal. De los 50 sin diabetes, 5 tuvieron glucosa elevada (falso positivo) y 45 normal.",
+   vp:45, fn:5, fp:5, vn:45,
+   explanation:"Cuando VP=VN y FN=FP, sensibilidad y especificidad coinciden."},
+  {id:8, difficulty:1, category:"Comparación de pruebas diagnósticas", title:"Mamografía de tamizaje",
+   text:"Se realizó mamografía de tamizaje a 100 mujeres. De las 50 con cáncer de mama confirmado por biopsia, 35 tuvieron mamografía positiva y 15 negativa. De las 50 sin cáncer, 10 tuvieron mamografía positiva y 40 negativa.",
+   vp:35, fn:15, fp:10, vn:40,
+   explanation:"Una sensibilidad moderada implica que una proporción importante de enfermos no será detectada (falsos negativos)."},
+  {id:9, difficulty:1, category:"Casos clínicos", title:"Prueba rápida de dengue",
+   text:"En una zona endémica, se aplicó una prueba rápida de dengue (NS1) a 100 pacientes febriles. De los 60 pacientes con dengue confirmado por PCR, 55 dieron positivo y 5 negativo. De los 40 pacientes sin dengue, 15 dieron positivo y 25 negativo.",
+   vp:55, fn:5, fp:15, vn:25,
+   explanation:"Con alta prevalencia en la muestra, el VPP tiende a ser más alto aunque la especificidad sea moderada."},
+  {id:10, difficulty:1, category:"Prevalencia y valores predictivos", title:"Perfil lipídico y colesterol elevado",
+   text:"Se tamizó el colesterol en 100 adultos mediante prueba capilar rápida. De los 20 con colesterol elevado confirmado por laboratorio, 10 dieron positivo en la prueba capilar y 10 negativo. De los 80 con colesterol normal, 10 dieron positivo (falso) y 70 negativo.",
+   vp:10, fn:10, fp:10, vn:70,
+   explanation:"Con baja prevalencia y especificidad limitada, el VPP suele ser bajo aunque la prueba parezca razonable."},
+
+  {id:11, difficulty:2, category:"Valores predictivos", title:"Prueba de antígeno prostático (PSA)",
+   text:"Se evaluó el PSA (antígeno prostático específico) como prueba de tamizaje para cáncer de próstata en 100 hombres. De los 45 con cáncer confirmado por biopsia, 38 tuvieron PSA elevado y 7 normal. De los 55 sin cáncer, 14 tuvieron PSA elevado (falso positivo) y 41 normal.",
+   vp:38, fn:7, fp:14, vn:41,
+   explanation:"El PSA es sensible pero poco específico, por lo que genera bastantes falsos positivos."},
+  {id:12, difficulty:2, category:"Pruebas diagnósticas", title:"Tamizaje de cáncer cervical (Papanicolaou)",
+   text:"En un programa de tamizaje, se realizó Papanicolaou a 100 mujeres. De las 45 con lesión confirmada por colposcopia, 33 tuvieron citología positiva y 12 negativa. De las 55 sin lesión, 9 tuvieron citología positiva y 46 negativa.",
+   vp:33, fn:12, fp:9, vn:46,
+   explanation:"Redondea los porcentajes solo al mostrarlos; usa siempre el valor exacto para comparar."},
+  {id:13, difficulty:2, category:"Sensibilidad y especificidad", title:"Prueba rápida de estreptococo",
+   text:"Se aplicó la prueba rápida de estreptococo a 100 niños con faringitis. De los 40 con cultivo positivo, 27 tuvieron prueba rápida positiva y 13 negativa. De los 60 con cultivo negativo, 8 tuvieron prueba rápida positiva y 52 negativa.",
+   vp:27, fn:13, fp:8, vn:52,
+   explanation:"Una sensibilidad de 67.5% significa que la prueba no detecta a casi 1 de cada 3 niños realmente infectados."},
+  {id:14, difficulty:2, category:"Casos clínicos", title:"Ecografía para apendicitis",
+   text:"Se evaluó la ecografía abdominal para diagnóstico de apendicitis aguda en 100 pacientes con dolor abdominal. De los 40 con apendicitis confirmada por cirugía, 31 tuvieron ecografía positiva y 9 negativa. De los 60 sin apendicitis, 11 tuvieron ecografía positiva y 49 negativa.",
+   vp:31, fn:9, fp:11, vn:49,
+   explanation:"La cirugía (o su hallazgo histopatológico) actúa aquí como estándar de referencia."},
+  {id:15, difficulty:2, category:"Interpretación de resultados", title:"Prueba de troponina en infarto",
+   text:"Se midió troponina en 100 pacientes con dolor torácico. De los 50 con infarto confirmado por electrocardiograma seriado y enzimas, 44 tuvieron troponina positiva y 6 negativa. De los 50 sin infarto, 7 tuvieron troponina positiva (falso) y 43 negativa.",
+   vp:44, fn:6, fp:7, vn:43,
+   explanation:"Sensibilidad y especificidad altas y similares producen VPP y VPN también altos y cercanos entre sí."},
+  {id:16, difficulty:2, category:"Pruebas diagnósticas", title:"Prueba de anticuerpos para hepatitis C",
+   text:"Se aplicó la prueba de anticuerpos anti-VHC a 100 pacientes. De los 50 con hepatitis C confirmada por PCR, 36 tuvieron anticuerpos positivos y 14 negativos. De los 50 sin hepatitis C, 6 tuvieron anticuerpos positivos (falso) y 44 negativos.",
+   vp:36, fn:14, fp:6, vn:44,
+   explanation:"La PCR se usa como estándar de referencia porque detecta el virus directamente, no solo anticuerpos."},
+  {id:17, difficulty:2, category:"Valores predictivos", title:"Prueba de alergia cutánea",
+   text:"Se realizó prueba cutánea de alergia a 100 pacientes con sospecha de rinitis alérgica. De los 30 con alergia confirmada por IgE específica, 22 tuvieron prueba cutánea positiva y 8 negativa. De los 70 sin alergia, 18 tuvieron prueba positiva (falso) y 52 negativa.",
+   vp:22, fn:8, fp:18, vn:52,
+   explanation:"Un VPP de 55% indica que casi la mitad de los positivos en esta muestra son falsos positivos."},
+  {id:18, difficulty:2, category:"Comparación de pruebas diagnósticas", title:"Radiografía de tórax para neumonía",
+   text:"Se evaluó la radiografía de tórax para diagnóstico de neumonía en 100 pacientes. De los 60 con neumonía confirmada por tomografía, 48 tuvieron radiografía positiva y 12 negativa. De los 40 sin neumonía, 9 tuvieron radiografía positiva y 31 negativa.",
+   vp:48, fn:12, fp:9, vn:31,
+   explanation:"La tomografía, más sensible, se usa aquí como referencia frente a la radiografía simple."},
+  {id:19, difficulty:2, category:"Sensibilidad y especificidad", title:"Prueba de dímero D para trombosis",
+   text:"Se aplicó la prueba de dímero D a 100 pacientes con sospecha de trombosis venosa profunda. De los 30 con trombosis confirmada por ecografía Doppler, 29 tuvieron dímero D positivo y 1 negativo. De los 70 sin trombosis, 39 tuvieron dímero D positivo (falso, por baja especificidad) y 31 negativo.",
+   vp:29, fn:1, fp:39, vn:31,
+   explanation:"El dímero D es clásicamente muy sensible pero poco específico: útil para descartar, no para confirmar."},
+  {id:20, difficulty:2, category:"Interpretación de resultados", title:"Prueba de Helicobacter pylori en aliento",
+   text:"Se realizó la prueba de aliento para Helicobacter pylori en 100 pacientes con dispepsia. De los 50 con infección confirmada por biopsia gástrica, 41 tuvieron prueba positiva y 9 negativa. De los 50 sin infección, 6 tuvieron prueba positiva y 44 negativa.",
+   vp:41, fn:9, fp:6, vn:44,
+   explanation:"La biopsia gástrica con histología es el estándar de referencia clásico para H. pylori."},
+
+  {id:21, difficulty:3, category:"Casos clínicos", title:"Brote de gastroenteritis en una escuela",
+   text:"Durante un brote de gastroenteritis en una escuela, se tomaron muestras de heces a 150 estudiantes con síntomas. El cultivo de heces (prueba de referencia) confirmó la infección por norovirus en 90 estudiantes. De estos, la prueba rápida de antígeno detectó correctamente a 78 y no detectó a 12. De los 60 estudiantes sin infección confirmada, la prueba rápida arrojó resultado positivo en 9 casos y negativo en 51. Organiza la información en la tabla 2×2 e identifica verdaderos positivos, falsos negativos, falsos positivos y verdaderos negativos antes de calcular los indicadores.",
+   vp:78, fn:12, fp:9, vn:51,
+   explanation:"El cultivo de heces es el estándar de referencia; la prueba rápida es la que se está evaluando."},
+  {id:22, difficulty:3, category:"Interpretación de resultados", title:"Tamizaje neonatal de hipotiroidismo",
+   text:"En un hospital se tamizó a 150 recién nacidos midiendo TSH en sangre de talón. El diagnóstico definitivo de hipotiroidismo congénito, confirmado posteriormente por perfil tiroideo completo, se estableció en 20 neonatos. De ellos, 18 habían tenido TSH elevada en el tamizaje y 2 tuvieron TSH normal (resultado falsamente tranquilizador). De los 130 neonatos sanos, 11 tuvieron TSH elevada de forma transitoria (falso positivo) y 119 tuvieron TSH normal. Determina primero quiénes son verdaderos enfermos antes de construir la tabla.",
+   vp:18, fn:2, fp:11, vn:119,
+   explanation:"Un VPP bajo con VPN muy alto es típico de tamizajes de enfermedades poco frecuentes."},
+  {id:23, difficulty:3, category:"Tablas 2×2", title:"Evaluación de una prueba de embarazo en urgencias",
+   text:"En el servicio de urgencias, 150 mujeres en edad fértil con dolor abdominal se sometieron a una prueba de embarazo en orina y, posteriormente, a una ecografía transvaginal (prueba de referencia). La ecografía confirmó embarazo en 45 mujeres. La prueba de orina fue positiva en 40 de ellas y negativa en 5. De las 105 mujeres no embarazadas, la prueba de orina resultó positiva en 8 (falso positivo) y negativa en 97. Antes de completar la tabla, identifica claramente cuál es la prueba en evaluación y cuál es el estándar de referencia.",
+   vp:40, fn:5, fp:8, vn:97,
+   explanation:"La ecografía transvaginal, más precisa, es aquí el estándar de referencia frente a la prueba de orina."},
+  {id:24, difficulty:3, category:"Pruebas diagnósticas", title:"Detección de cáncer colorrectal con sangre oculta en heces",
+   text:"Se realizó tamizaje de cáncer colorrectal mediante prueba de sangre oculta en heces a 150 adultos mayores de 50 años. La colonoscopia (prueba de referencia) confirmó lesión neoplásica en 30 pacientes. De ellos, la prueba de sangre oculta fue positiva en 21 y negativa en 9. De los 120 pacientes sin lesión, la prueba fue positiva en 18 (falso positivo) y negativa en 102.",
+   vp:21, fn:9, fp:18, vn:102,
+   explanation:"Una sensibilidad de 70% implica que 3 de cada 10 lesiones pasan desapercibidas con esta prueba."},
+  {id:25, difficulty:3, category:"Sensibilidad y especificidad", title:"Evaluación de un cuestionario de tamizaje para depresión",
+   text:"Se aplicó un cuestionario de tamizaje para depresión (PHQ-9) a 150 pacientes de atención primaria. La evaluación psiquiátrica estructurada, considerada el estándar de referencia, confirmó depresión mayor en 50 pacientes. De ellos, 44 obtuvieron puntaje positivo en el cuestionario y 6 puntaje negativo. De los 100 pacientes sin depresión, 22 obtuvieron puntaje positivo (falso) y 78 puntaje negativo. Antes de construir la tabla, ten en cuenta que el cuestionario es la prueba en evaluación, no el estándar de referencia.",
+   vp:44, fn:6, fp:22, vn:78,
+   explanation:"Los cuestionarios de tamizaje suelen priorizar sensibilidad sobre especificidad para no dejar casos sin detectar."},
+  {id:26, difficulty:3, category:"Casos clínicos", title:"Prueba rápida de sífilis en control prenatal",
+   text:"En un programa de control prenatal, se aplicó una prueba rápida treponémica para sífilis a 150 gestantes. La prueba confirmatoria de laboratorio (FTA-ABS) determinó que 25 gestantes tenían infección activa. De ellas, la prueba rápida detectó correctamente a 23 y no detectó a 2. De las 125 gestantes sin infección, la prueba rápida resultó positiva en 10 (falso positivo, posiblemente por infección pasada) y negativa en 115.",
+   vp:23, fn:2, fp:10, vn:115,
+   explanation:"Las pruebas treponémicas pueden mantenerse positivas tras una infección tratada, generando falsos positivos."},
+  {id:27, difficulty:3, category:"Interpretación de resultados", title:"Tamizaje auditivo neonatal (otoemisiones acústicas)",
+   text:"Se realizó tamizaje auditivo neonatal con otoemisiones acústicas a 150 recién nacidos. La evaluación audiológica completa, realizada meses después como estándar de referencia, confirmó hipoacusia en 15 neonatos. De ellos, 13 habían tenido resultado anormal en el tamizaje y 2 resultado normal. De los 135 neonatos con audición normal, 20 habían tenido resultado anormal en el tamizaje (falso positivo, frecuente en este tipo de prueba) y 115 resultado normal.",
+   vp:13, fn:2, fp:20, vn:115,
+   explanation:"Un tamizaje con muchos falsos positivos requiere pruebas confirmatorias posteriores antes de un diagnóstico definitivo."},
+  {id:28, difficulty:3, category:"Comparación de pruebas diagnósticas", title:"Prueba de esfuerzo para enfermedad coronaria",
+   text:"Se realizó una prueba de esfuerzo (ergometría) a 150 pacientes con dolor torácico atípico. La angiografía coronaria, considerada el estándar de referencia, confirmó enfermedad coronaria significativa en 60 pacientes. De ellos, 48 tuvieron prueba de esfuerzo positiva y 12 negativa. De los 90 pacientes sin enfermedad coronaria significativa, 27 tuvieron prueba de esfuerzo positiva (falso positivo) y 63 negativa.",
+   vp:48, fn:12, fp:27, vn:63,
+   explanation:"La angiografía coronaria es el estándar de referencia clásico para enfermedad coronaria obstructiva."},
+  {id:29, difficulty:3, category:"Valores predictivos", title:"Detección de VPH de alto riesgo",
+   text:"Se realizó prueba de VPH de alto riesgo a 150 mujeres, y posteriormente se les realizó colposcopia con biopsia (estándar de referencia). La biopsia confirmó lesión de alto grado en 20 mujeres. De ellas, 19 tuvieron prueba de VPH positiva y 1 negativa. De las 130 mujeres sin lesión de alto grado, 35 tuvieron prueba de VPH positiva (la infección por VPH es frecuente sin progresar a lesión) y 95 negativa.",
+   vp:19, fn:1, fp:35, vn:95,
+   explanation:"Muchas infecciones por VPH no progresan a lesión, lo que reduce la especificidad frente a la biopsia."},
+  {id:30, difficulty:3, category:"Pruebas diagnósticas", title:"Prueba rápida de malaria en zona endémica",
+   text:"En una zona endémica de malaria, se aplicó una prueba rápida de detección de antígeno a 150 pacientes febriles. La gota gruesa examinada por microscopía (estándar de referencia) confirmó malaria en 70 pacientes. De ellos, 65 tuvieron prueba rápida positiva y 5 negativa. De los 80 pacientes sin malaria, 6 tuvieron prueba rápida positiva (falso positivo) y 74 negativa.",
+   vp:65, fn:5, fp:6, vn:74,
+   explanation:"La gota gruesa por microscopía sigue siendo el estándar de referencia clásico para malaria."},
+
+  {id:31, difficulty:4, category:"Casos clínicos", title:"Evaluación de biomarcador para sepsis en UCI",
+   text:"En una unidad de cuidados intensivos, se evaluó un nuevo biomarcador (procalcitonina) para el diagnóstico de sepsis en 180 pacientes críticos. El diagnóstico clínico definitivo de sepsis, establecido por un comité de expertos según los criterios de consenso, se confirmó en 63 pacientes. De ellos, 54 tuvieron procalcitonina elevada y 9 tuvieron valores normales a pesar de la infección. De los 117 pacientes sin sepsis, 19 tuvieron procalcitonina elevada (posiblemente por otra causa inflamatoria) y 98 tuvieron valores normales.",
+   vp:54, fn:9, fp:19, vn:98,
+   explanation:"Otras causas de inflamación no infecciosa pueden elevar la procalcitonina y generar falsos positivos."},
+  {id:32, difficulty:4, category:"Interpretación de resultados", title:"Prueba genética para fibrosis quística",
+   text:"Se evaluó una prueba genética de tamizaje para fibrosis quística en 210 recién nacidos con antecedentes familiares. El estudio genético completo, considerado el estándar de referencia, confirmó la enfermedad en 28 neonatos. De ellos, 24 tuvieron resultado positivo en la prueba de tamizaje y 4 resultaron negativos, ya que la prueba no detecta todas las mutaciones posibles. De los 182 neonatos sin la enfermedad, 13 tuvieron resultado positivo (portadores no afectados detectados erróneamente como positivos) y 169 resultaron negativos.",
+   vp:24, fn:4, fp:13, vn:169,
+   explanation:"Los paneles genéticos dirigidos no cubren todas las mutaciones posibles, lo que limita la sensibilidad."},
+  {id:33, difficulty:4, category:"Comparación de pruebas diagnósticas", title:"Detección de tuberculosis con prueba molecular en zona de alta carga",
+   text:"En una región con alta carga de tuberculosis, se comparó una prueba molecular rápida (Xpert MTB/RIF) frente al cultivo de esputo, considerado estándar de referencia, en 240 pacientes con síntomas respiratorios prolongados. El cultivo confirmó tuberculosis en 84 pacientes. De ellos, la prueba molecular detectó correctamente a 76 y no detectó a 8, principalmente en casos con baja carga bacilar. De los 156 pacientes sin tuberculosis, la prueba molecular resultó positiva en 11 (falso positivo) y negativa en 145.",
+   vp:76, fn:8, fp:11, vn:145,
+   explanation:"La sensibilidad de las pruebas moleculares para tuberculosis suele disminuir en casos con baja carga bacilar."},
+  {id:34, difficulty:4, category:"Casos clínicos", title:"Evaluación de un test serológico para dengue en zona de reciente brote",
+   text:"Durante un brote de dengue, se evaluó un test serológico de IgM en 225 pacientes con cuadro febril agudo. La confirmación por PCR y aislamiento viral, tomada como estándar de referencia, estableció el diagnóstico en 90 pacientes. De ellos, 72 tuvieron IgM positiva y 18 tuvieron resultado negativo, dado que los anticuerpos IgM pueden tardar varios días en aparecer. De los 135 pacientes sin dengue confirmado, 22 tuvieron IgM positiva (posible reacción cruzada con otros flavivirus) y 113 tuvieron resultado negativo.",
+   vp:72, fn:18, fp:22, vn:113,
+   explanation:"El momento de la toma de muestra respecto al inicio de síntomas influye en la sensibilidad de las pruebas serológicas."},
+  {id:35, difficulty:4, category:"Sensibilidad y especificidad", title:"Prueba de función pulmonar en tamizaje de EPOC",
+   text:"En un programa comunitario, se aplicó un espirómetro portátil como prueba de tamizaje de EPOC a 260 fumadores mayores de 40 años. La espirometría completa realizada en un laboratorio especializado, tomada como estándar de referencia, confirmó EPOC en 91 participantes. De ellos, el espirómetro portátil detectó correctamente a 79 y no detectó a 12. De los 169 participantes sin EPOC, el espirómetro portátil arrojó resultado positivo en 24 (falso positivo) y negativo en 145.",
+   vp:79, fn:12, fp:24, vn:145,
+   explanation:"Los equipos portátiles suelen tener menor precisión técnica que la espirometría de laboratorio."},
+  {id:36, difficulty:4, category:"Valores predictivos", title:"Detección de preeclampsia con biomarcador angiogénico",
+   text:"Se evaluó un biomarcador angiogénico (relación sFlt-1/PlGF) para predecir preeclampsia en 195 gestantes con factores de riesgo. El diagnóstico clínico de preeclampsia, confirmado según criterios establecidos por el equipo obstétrico, se presentó en 39 gestantes. De ellas, 34 tuvieron el biomarcador alterado antes del inicio de síntomas y 5 tuvieron valores dentro de rango normal. De las 156 gestantes que no desarrollaron preeclampsia, 16 tuvieron el biomarcador alterado (falso positivo) y 140 tuvieron valores normales.",
+   vp:34, fn:5, fp:16, vn:140,
+   explanation:"Un biomarcador predictivo se evalúa antes de que aparezcan los síntomas clínicos de la enfermedad."},
+  {id:37, difficulty:4, category:"Pruebas diagnósticas", title:"Prueba de detección rápida de estreptococo del grupo B",
+   text:"Se evaluó una prueba rápida molecular para detectar estreptococo del grupo B (SGB) en 220 gestantes al momento del parto. El cultivo vaginal-rectal, realizado como estándar de referencia semanas antes, identificó colonización por SGB en 55 gestantes. De ellas, la prueba rápida detectó correctamente a 47 y no detectó a 8, posiblemente por cambios en la colonización desde el cultivo previo. De las 165 gestantes no colonizadas, la prueba rápida resultó positiva en 14 (falso positivo) y negativa en 151.",
+   vp:47, fn:8, fp:14, vn:151,
+   explanation:"La colonización por SGB puede variar en el tiempo, afectando la concordancia entre pruebas realizadas en momentos distintos."},
+  {id:38, difficulty:4, category:"Interpretación de resultados", title:"Evaluación de un biomarcador para rechazo de trasplante renal",
+   text:"En pacientes trasplantados renales, se evaluó un biomarcador urinario no invasivo para detectar rechazo agudo en 168 pacientes con deterioro de la función renal. La biopsia renal, considerada el estándar de referencia, confirmó rechazo agudo en 42 pacientes. De ellos, 36 tuvieron el biomarcador positivo y 6 negativo. De los 126 pacientes sin rechazo confirmado por biopsia, 21 tuvieron el biomarcador positivo (falso positivo, asociado a otras causas de daño renal) y 105 negativo.",
+   vp:36, fn:6, fp:21, vn:105,
+   explanation:"Un biomarcador no invasivo con buen desempeño podría reducir la necesidad de biopsias renales."},
+  {id:39, difficulty:4, category:"Casos clínicos", title:"Prueba de detección de anticuerpos en enfermedad celíaca",
+   text:"Se evaluaron los anticuerpos antitransglutaminasa como prueba de tamizaje de enfermedad celíaca en 232 pacientes con síntomas digestivos crónicos. La biopsia duodenal, considerada el estándar de referencia, confirmó enfermedad celíaca en 58 pacientes. De ellos, 53 tuvieron anticuerpos positivos y 5 negativos, estos últimos asociados a deficiencia de IgA. De los 174 pacientes sin enfermedad celíaca, 12 tuvieron anticuerpos positivos (falso positivo) y 162 negativos.",
+   vp:53, fn:5, fp:12, vn:162,
+   explanation:"La deficiencia de IgA es una causa conocida de falsos negativos en la serología para enfermedad celíaca."},
+  {id:40, difficulty:4, category:"Comparación de pruebas diagnósticas", title:"Detección de osteoporosis con ultrasonido de talón",
+   text:"Se evaluó el ultrasonido cuantitativo de talón como alternativa de tamizaje frente a la densitometría ósea (DEXA), considerada el estándar de referencia, en 250 mujeres posmenopáusicas. La DEXA confirmó osteoporosis en 75 mujeres. De ellas, el ultrasonido detectó correctamente a 60 y no detectó a 15. De las 175 mujeres sin osteoporosis según DEXA, el ultrasonido resultó positivo en 28 (falso positivo) y negativo en 147.",
+   vp:60, fn:15, fp:28, vn:147,
+   explanation:"El ultrasonido de talón es más accesible que la DEXA, pero con menor precisión diagnóstica."},
+
+  {id:41, difficulty:5, category:"Prevalencia y valores predictivos", title:"Tamizaje de una enfermedad rara en población general",
+   text:"Una prueba diagnóstica tiene una sensibilidad del 95% y una especificidad del 90%, según estudios previos. Se aplica a una población de 1000 personas en la que la prevalencia de la enfermedad es del 2%. Determina cuántos verdaderos positivos, falsos negativos, falsos positivos y verdaderos negativos se esperarían, y calcula los valores predictivos resultantes. Ten en cuenta que, al ser una enfermedad de baja prevalencia, el valor predictivo positivo puede ser bajo aunque la prueba sea muy sensible y específica.",
+   vp:19, fn:1, fp:98, vn:882,
+   explanation:"Con baja prevalencia, incluso una especificidad del 90% genera muchos falsos positivos en números absolutos, hundiendo el VPP."},
+  {id:42, difficulty:5, category:"Comparación de pruebas diagnósticas", title:"Comparación de dos pruebas para cáncer de ovario",
+   text:"En una población de 800 mujeres con masa anexial, se comparó el marcador CA-125 frente al estándar de referencia (cirugía con histopatología). La histopatología confirmó malignidad en 160 mujeres (prevalencia del 20%). El CA-125 tuvo una sensibilidad reportada del 80% y una especificidad del 75% en este grupo. Calcula el número de casos en cada celda de la tabla y los valores predictivos, y explica por qué el VPP sería distinto en una población con menor prevalencia de malignidad.",
+   vp:128, fn:32, fp:160, vn:480,
+   explanation:"A mayor prevalencia en la población estudiada, mayor tiende a ser el VPP para una misma sensibilidad y especificidad."},
+  {id:43, difficulty:5, category:"Prevalencia y valores predictivos", title:"Tamizaje de cáncer de pulmón en fumadores",
+   text:"Se realiza tamizaje con tomografía de baja dosis en 1000 fumadores de alto riesgo para detectar cáncer de pulmón. La prevalencia esperada en este grupo es del 4%. La prueba tiene una sensibilidad del 92.5% y una especificidad del 75%. Determina la tabla 2×2 completa (número de personas en cada celda) y los valores predictivos resultantes, y comenta por qué, a pesar de la buena sensibilidad, el valor predictivo positivo es relativamente bajo.",
+   vp:37, fn:3, fp:240, vn:720,
+   explanation:"Una especificidad de 75% en una enfermedad poco prevalente produce un número de falsos positivos muy superior al de verdaderos positivos."},
+  {id:44, difficulty:5, category:"Casos clínicos", title:"Tamizaje de enfermedad de Chagas en banco de sangre",
+   text:"Un banco de sangre tamiza a 1000 donantes para enfermedad de Chagas mediante prueba serológica con sensibilidad del 95% y especificidad del 95%. En la región, la prevalencia estimada de la infección en donantes es del 2%. Calcula la tabla 2×2 completa y los valores predictivos, y explica la implicación de un resultado positivo en este contexto de baja prevalencia.",
+   vp:19, fn:1, fp:49, vn:931,
+   explanation:"Incluso con sensibilidad y especificidad iguales del 95%, un VPP de aproximadamente 28% obliga a confirmar todo resultado positivo con una segunda prueba."},
+  {id:45, difficulty:5, category:"Comparación de pruebas diagnósticas", title:"Reevaluación de una prueba tras cambiar la población de estudio",
+   text:"Una prueba diagnóstica para una enfermedad autoinmune tiene sensibilidad del 85% y especificidad del 90%. Se aplica en una clínica especializada de 600 pacientes remitidos, donde la prevalencia de la enfermedad es del 30% debido a la selección previa de casos sospechosos. Calcula la tabla 2×2 completa y los valores predictivos, y compara conceptualmente cómo cambiarían el VPP y el VPN si la misma prueba se aplicara en la población general, donde la prevalencia es mucho menor.",
+   vp:153, fn:27, fp:42, vn:378,
+   explanation:"En poblaciones seleccionadas de alta prevalencia, el VPP mejora, pero el VPN tiende a disminuir frente a la población general."},
+  {id:46, difficulty:5, category:"Comparación de pruebas diagnósticas", title:"Prueba de tamizaje para hipotiroidismo subclínico",
+   text:"Se evalúa una prueba de tamizaje para hipotiroidismo subclínico en 700 pacientes, usando el perfil tiroideo completo como estándar de referencia, que confirmó la condición en 105 pacientes (15% de prevalencia). La prueba tuvo una sensibilidad reportada de aproximadamente 88% y una especificidad de aproximadamente 82% en este grupo. Calcula la tabla 2×2 y los valores predictivos correspondientes.",
+   vp:92, fn:13, fp:107, vn:488,
+   explanation:"Verifica siempre que VP+FN coincida con el total de enfermos, y FP+VN con el total de sanos, antes de calcular los indicadores."},
+  {id:47, difficulty:5, category:"Interpretación de resultados", title:"Test genético predictivo en familiares de primer grado",
+   text:"Se evalúa un test genético predictivo para una enfermedad hereditaria en 500 familiares de primer grado de pacientes afectados, donde la prevalencia esperada de portadores es del 25% según el patrón de herencia. El test tiene una sensibilidad del 96% y una especificidad de aproximadamente 94%. Calcula la tabla 2×2 completa y los valores predictivos, y explica por qué el contexto familiar (alta prevalencia esperada) mejora el valor predictivo positivo en comparación con el tamizaje poblacional general.",
+   vp:120, fn:5, fp:22, vn:353,
+   explanation:"El estudio de familiares de primer grado aumenta la prevalencia esperada, lo que eleva sustancialmente el VPP frente al tamizaje poblacional."},
+  {id:48, difficulty:5, category:"Interpretación de resultados", title:"Análisis de una prueba con información indirecta",
+   text:"En un estudio de 900 pacientes, se sabe que la prueba en evaluación tuvo un total de 270 resultados positivos y 630 resultados negativos. Del total de pacientes, 300 tenían la enfermedad confirmada por el estándar de referencia. De los pacientes enfermos, 240 tuvieron resultado positivo. Con esta información indirecta, deduce el resto de las celdas de la tabla (falsos negativos, falsos positivos y verdaderos negativos) antes de calcular los indicadores diagnósticos.",
+   vp:240, fn:60, fp:30, vn:570,
+   explanation:"FN se obtiene restando VP del total de enfermos; FP se obtiene restando VP del total de positivos; VN se obtiene por diferencia del total general."},
+  {id:49, difficulty:5, category:"Comparación de pruebas diagnósticas", title:"Biomarcador para insuficiencia cardíaca en urgencias",
+   text:"Se evalúa un biomarcador continuo para insuficiencia cardíaca (péptido natriurético) en 400 pacientes con disnea aguda, usando un punto de corte determinado. El ecocardiograma, como estándar de referencia, confirmó insuficiencia cardíaca en 160 pacientes (40% de prevalencia en este servicio de urgencias). Con el punto de corte evaluado, 144 pacientes enfermos tuvieron resultado positivo. De los 240 pacientes sin insuficiencia cardíaca, 36 tuvieron resultado positivo (falso positivo). Calcula la tabla completa y los valores predictivos, y razona qué ocurriría con el VPP si se usara un punto de corte más alto (mayor especificidad, menor sensibilidad).",
+   vp:144, fn:16, fp:36, vn:204,
+   explanation:"Al subir el punto de corte de un biomarcador continuo, generalmente aumenta la especificidad pero disminuye la sensibilidad."},
+  {id:50, difficulty:5, category:"Prevalencia y valores predictivos", title:"Prueba predictiva de riesgo cardiovascular en un estudio de cohorte",
+   text:"En un estudio de cohorte, se siguió a 1000 personas inicialmente sanas durante 5 años para evaluar una prueba predictiva de riesgo cardiovascular. Al final del seguimiento, 150 personas desarrollaron un evento cardiovascular mayor (incidencia acumulada del 15%, utilizada aquí como equivalente a la prevalencia de 'casos' para el análisis de la prueba). De estas 150 personas, la prueba había clasificado correctamente como alto riesgo a 120 al inicio del estudio, y como bajo riesgo a 30 (falsos negativos). De las 850 personas que no desarrollaron el evento, la prueba había clasificado como alto riesgo a 102 (falsos positivos) y como bajo riesgo a 748.",
+   vp:120, fn:30, fp:102, vn:748,
+   explanation:"En estudios predictivos a largo plazo, la 'prueba' es la clasificación inicial de riesgo y el 'estándar de referencia' es el evento observado durante el seguimiento."}
+];
+
+/* =========================================================
+   ESTADO DE LA SESIÓN
+   ========================================================= */
+const state = {
+  current: null,
+  usedIds: new Set(),
+  corrected: false,
+  difficultyFilter: "all",
+  session: {
+    count: 0,
+    totalScore: 0,
+    best: null,
+    hardCount: 0
+  }
+};
+
+const TOLERANCE_PCT = 0.5;
+
+/* =========================================================
+   FÓRMULAS EPIDEMIOLÓGICAS
+   ========================================================= */
+function calculateAll(p){
+  const vp = p.vp, fn = p.fn, fp = p.fp, vn = p.vn;
+  const totEnfPos = vp + fn;
+  const totEnfNeg = fp + vn;
+  const totPruebaPos = vp + fp;
+  const totPruebaNeg = fn + vn;
+  const totGeneral = vp + fn + fp + vn;
+  const sens = (vp / (vp + fn)) * 100;
+  const spec = (vn / (vn + fp)) * 100;
+  const vpp = (vp / (vp + fp)) * 100;
+  const vpn = (vn / (vn + fn)) * 100;
+  return {vp, fn, fp, vn, totEnfPos, totEnfNeg, totPruebaPos, totPruebaNeg, totGeneral, sens, spec, vpp, vpn};
+}
+
+function calculateScore() { /* implemented inline in checkAnswers via POINTS map */ }
+
+/* Puntos por campo (suman 100) */
+const POINTS = {
+  vp: 8, fn: 8, fp: 8, vn: 8,
+  totEnfPos: 5, totEnfNeg: 5, totPruebaPos: 5, totPruebaNeg: 5, totGeneral: 4,
+  sens: 10, spec: 10, vpp: 10, vpn: 10
+};
+
+const FIELD_LABELS = {
+  vp:"VP", fn:"FN", fp:"FP", vn:"VN",
+  totEnfPos:"Total enfermedad +", totEnfNeg:"Total enfermedad −",
+  totPruebaPos:"Total prueba +", totPruebaNeg:"Total prueba −", totGeneral:"Total general",
+  sens:"Sensibilidad", spec:"Especificidad", vpp:"VPP", vpn:"VPN"
+};
+
+const PCT_FORMULA_TEXT = {
+  sens:"Se calcula mediante VP / (VP + FN) × 100.",
+  spec:"Se calcula mediante VN / (VN + FP) × 100.",
+  vpp:"Se calcula mediante VP / (VP + FP) × 100.",
+  vpn:"Se calcula mediante VN / (VN + FN) × 100."
+};
+
+/* =========================================================
+   SELECCIÓN DE PROBLEMAS
+   ========================================================= */
+function filteredProblems(){
+  if (state.difficultyFilter === "all") return PROBLEMS;
+  const d = parseInt(state.difficultyFilter, 10);
+  return PROBLEMS.filter(p => p.difficulty === d);
+}
+
+function pickRandomProblem(){
+  let pool = filteredProblems();
+  let available = pool.filter(p => !state.usedIds.has(p.id));
+  if (available.length === 0){
+    // Reiniciar el registro de problemas usados dentro del filtro actual
+    pool.forEach(p => state.usedIds.delete(p.id));
+    available = pool;
+  }
+  // Evitar repetir inmediatamente el mismo problema si hay más de una opción
+  let candidates = available;
+  if (state.current && available.length > 1){
+    candidates = available.filter(p => p.id !== state.current.id);
+  }
+  const chosen = candidates[Math.floor(Math.random() * candidates.length)];
+  state.usedIds.add(chosen.id);
+  return chosen;
+}
+
+/* =========================================================
+   RENDERIZADO
+   ========================================================= */
+const FIELD_ORDER_TABLE = ["vp","fn","totEnfPos","fp","vn","totEnfNeg","totPruebaPos","totPruebaNeg","totGeneral"];
+const PCT_FIELDS = ["sens","spec","vpp","vpn"];
+
+function starString(n){
+  return "★".repeat(n) + "☆".repeat(5 - n);
+}
+
+function renderProblem(){
+  const p = state.current;
+  const idx = PROBLEMS.findIndex(x => x.id === p.id) + 1;
+  document.getElementById("problemIdLabel").textContent = "Problema " + p.id + " de " + PROBLEMS.length;
+  document.getElementById("problemStars").textContent = starString(p.difficulty);
+  document.getElementById("problemStars").setAttribute("aria-label", "Dificultad " + p.difficulty + " de 5 estrellas");
+  document.getElementById("problemCategory").textContent = p.category;
+  document.getElementById("problemTitle").textContent = p.title;
+  document.getElementById("problemText").textContent = p.text;
+  document.getElementById("problemCounter").textContent = "Problema " + p.id + " de " + PROBLEMS.length;
+
+  // Reconstruir celdas de la tabla
+  const tbody = document.querySelector("#epiTable tbody");
+  const cells = tbody.querySelectorAll("td.field");
+  cells.forEach(td => {
+    const field = td.getAttribute("data-field");
+    td.className = "field";
+    td.innerHTML =
+      '<div class="cell-input-wrap">' +
+      '<input class="cell-input" type="text" inputmode="numeric" aria-label="' + FIELD_LABELS[field] + '" data-field="' + field + '">' +
+      '<span class="cell-status" data-status="' + field + '"></span>' +
+      '</div>';
+  });
+
+  // Limpiar porcentajes
+  PCT_FIELDS.forEach(f => {
+    document.getElementById("input-" + f).value = "";
+    document.querySelector('.pct-field[data-field="' + f + '"]').className = "pct-field";
+    document.getElementById("feedback-" + f).textContent = "";
+  });
+
+  document.getElementById("resultCard").style.display = "none";
+  document.getElementById("warnMsg").style.display = "none";
+  state.corrected = false;
+}
+
+function readInputs(){
+  const answers = {};
+  document.querySelectorAll("#epiTable input.cell-input").forEach(inp => {
+    answers[inp.getAttribute("data-field")] = inp.value.trim();
+  });
+  PCT_FIELDS.forEach(f => {
+    answers[f] = document.getElementById("input-" + f).value.trim();
+  });
+  return answers;
+}
+
+function allFilled(answers){
+  return Object.values(answers).every(v => v !== "" && v !== null && v !== undefined);
+}
+
+function parseIntStrict(v){
+  if (!/^-?\d+$/.test(v)) return null;
+  return parseInt(v, 10);
+}
+
+function parseDecimal(v){
+  if (!/^\d+(\.\d+)?$/.test(v)) return null;
+  return parseFloat(v);
+}
+
+/* =========================================================
+   CORRECCIÓN
+   ========================================================= */
+function checkAnswers(){
+  const answers = readInputs();
+  if (!allFilled(answers)){
+    const warn = document.getElementById("warnMsg");
+    warn.textContent = "Completa todos los campos antes de corregir.";
+    warn.style.display = "block";
+    return;
+  }
+  document.getElementById("warnMsg").style.display = "none";
+
+  const correct = calculateAll(state.current);
+  let scoreEarned = 0;
+  let numCorrect = 0;
+  let numIncorrect = 0;
+  const tableReview = [];
+  const pctReview = [];
+
+  // Campos enteros de la tabla
+  FIELD_ORDER_TABLE.forEach(field => {
+    const raw = answers[field];
+    const userVal = parseIntStrict(raw);
+    const correctVal = Math.round(correct[field]);
+    const isOk = (userVal !== null) && (userVal === correctVal);
+    const td = document.querySelector('td.field[data-field="' + field + '"]');
+    const input = td.querySelector("input.cell-input");
+    const statusEl = td.querySelector(".cell-status");
+    input.disabled = true;
+    if (isOk){
+      td.classList.add("ok");
+      statusEl.textContent = "✓ Correcto";
+      statusEl.className = "cell-status ok";
+      scoreEarned += POINTS[field];
+      numCorrect++;
+    } else {
+      td.classList.add("bad");
+      statusEl.textContent = "✕ Incorrecto — respuesta correcta: " + correctVal;
+      statusEl.className = "cell-status bad";
+      numIncorrect++;
+    }
+    tableReview.push({field, ok:isOk, userVal: raw, correctVal});
+  });
+
+  // Campos de porcentaje
+  PCT_FIELDS.forEach(field => {
+    const raw = answers[field];
+    const userVal = parseDecimal(raw);
+    const correctVal = correct[field];
+    const isOk = (userVal !== null) && (Math.abs(userVal - correctVal) <= TOLERANCE_PCT);
+    const wrap = document.querySelector('.pct-field[data-field="' + field + '"]');
+    const input = document.getElementById("input-" + field);
+    const feedback = document.getElementById("feedback-" + field);
+    input.disabled = true;
+    if (isOk){
+      wrap.className = "pct-field ok";
+      feedback.textContent = "✓ Correcto (" + userVal.toFixed(1) + "%)";
+      feedback.className = "pct-feedback ok";
+      scoreEarned += POINTS[field];
+      numCorrect++;
+    } else {
+      wrap.className = "pct-field bad";
+      feedback.textContent = "✕ Incorrecto — respuesta correcta: " + correctVal.toFixed(1) + "%";
+      feedback.className = "pct-feedback bad";
+      numIncorrect++;
+    }
+    pctReview.push({field, ok:isOk, userVal: raw, correctVal});
+  });
+
+  state.corrected = true;
+  renderResults(scoreEarned, numCorrect, numIncorrect, tableReview, pctReview);
+  updateSessionStats(scoreEarned);
+}
+
+function classification(score){
+  if (score >= 90) return {label:"Excelente", cls:"excelente"};
+  if (score >= 80) return {label:"Muy bien", cls:"muybien"};
+  if (score >= 70) return {label:"Bien", cls:"bien"};
+  if (score >= 60) return {label:"Necesitas repasar", cls:"repasar"};
+  return {label:"Necesitas reforzar los fundamentos", cls:"reforzar"};
+}
+
+function renderResults(score, numCorrect, numIncorrect, tableReview, pctReview){
+  document.getElementById("resultCard").style.display = "block";
+  document.getElementById("scoreBig").textContent = score + " / 100";
+  document.getElementById("scoreSub").textContent = numCorrect + " correctas · " + numIncorrect + " incorrectas";
+  const cls = classification(score);
+  const tag = document.getElementById("scoreTag");
+  tag.textContent = cls.label;
+  tag.className = "score-tag " + cls.cls;
+
+  const tableList = document.getElementById("reviewTableList");
+  tableList.innerHTML = "<h3 class=\"section-title\" style=\"text-align:left;\">Revisión — tabla</h3>" +
+    tableReview.map(r => {
+      if (r.ok){
+        return '<div class="review-item"><span class="review-icon ok">✓</span><div class="review-body"><b>' + FIELD_LABELS[r.field] + '</b>: Correcto</div></div>';
+      }
+      return '<div class="review-item"><span class="review-icon bad">✕</span><div class="review-body"><b>' + FIELD_LABELS[r.field] + '</b>: Incorrecto.<div class="review-detail">Tu respuesta: ' + (r.userVal || "—") + ' · Respuesta correcta: ' + r.correctVal + '</div></div></div>';
+    }).join("");
+
+  const pctList = document.getElementById("reviewPctList");
+  pctList.innerHTML = "<h3 class=\"section-title\" style=\"text-align:left;\">Resultados epidemiológicos</h3>" +
+    pctReview.map(r => {
+      const label = FIELD_LABELS[r.field];
+      if (r.ok){
+        return '<div class="review-item"><span class="review-icon ok">✓</span><div class="review-body"><b>' + label + '</b>: ' + r.correctVal.toFixed(1) + '%</div></div>';
+      }
+      return '<div class="review-item"><span class="review-icon bad">✕</span><div class="review-body"><b>' + label + '</b>: Incorrecto.<div class="review-detail">Tu respuesta: ' + (r.userVal || "—") + '% · Respuesta correcta: ' + r.correctVal.toFixed(1) + '%<br>' + PCT_FORMULA_TEXT[r.field] + '</div></div></div>';
+    }).join("") +
+    '<p class="hint-text" style="margin-top:10px;">' + state.current.explanation + '</p>';
+
+  document.getElementById("resultCard").scrollIntoView({behavior:"smooth", block:"start"});
+}
+
+/* =========================================================
+   PROGRESO DE SESIÓN
+   ========================================================= */
+function updateSessionStats(score){
+  const s = state.session;
+  s.count += 1;
+  s.totalScore += score;
+  if (s.best === null || score > s.best) s.best = score;
+  if (state.current.difficulty === 5) s.hardCount += 1;
+  renderProgress();
+}
+
+function renderProgress(){
+  const s = state.session;
+  document.getElementById("progCount").textContent = s.count;
+  document.getElementById("progAvg").textContent = s.count > 0 ? Math.round(s.totalScore / s.count) + " / 100" : "—";
+  document.getElementById("progBest").textContent = s.best !== null ? s.best + " / 100" : "—";
+  document.getElementById("progHard").textContent = s.hardCount;
+}
+
+/* =========================================================
+   EVENTOS
+   ========================================================= */
+function newProblem(){
+  state.current = pickRandomProblem();
+  renderProblem();
+}
+
+document.getElementById("btnCorrect").addEventListener("click", () => {
+  if (!state.corrected) checkAnswers();
+});
+
+document.getElementById("btnNewProblem").addEventListener("click", () => {
+  newProblem();
+});
+
+document.getElementById("difficultyFilter").addEventListener("change", (e) => {
+  state.difficultyFilter = e.target.value;
+  newProblem();
+});
+
+/* =========================================================
+   INICIALIZACIÓN
+   ========================================================= */
+function init(){
+  newProblem();
+  renderProgress();
+}
+init();
+</script>
+</body>
+</html>
